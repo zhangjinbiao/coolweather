@@ -81,6 +81,11 @@ public class ChooseAreaActivity extends Activity{
 	 * 当前选中的的级别
 	 * */
 	private int currentLevel;
+	
+	/**
+	 *是否从weatherActivity中跳转过来 
+	 */
+	private boolean isFromWeatherActivity;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,12 +93,18 @@ public class ChooseAreaActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
-		if(prefs.getBoolean("city_selected", false)){
-			Intent intent = new Intent(this, WeatherActivity.class);
-			startActivity(intent);
-			finish();
-			return; 
-		}
+		 isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
+		 
+			
+			if(prefs.getBoolean("city_selected", false) && !isFromWeatherActivity){
+				Intent intent = new Intent(this, WeatherActivity.class);
+				startActivity(intent);
+				finish();
+				return; 
+			}
+		
+		
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
 		listView = (ListView)findViewById(R.id.list_view);
@@ -132,6 +143,7 @@ public class ChooseAreaActivity extends Activity{
 	 * */
 	private void queryProvinces(){
 		provinceList = coolWeatherDB.loadProvinces();
+		
 		if(provinceList.size() > 0){
 			dataList.clear();
 			for(Province province : provinceList){
@@ -151,6 +163,7 @@ public class ChooseAreaActivity extends Activity{
 	 * */
 	private void queryCities(){
 		cityList = coolWeatherDB.loadCities(selectedProvince.getId());
+		
 		if(cityList.size() > 0 ){
 			dataList.clear();
 			for(City city : cityList){
@@ -170,6 +183,7 @@ public class ChooseAreaActivity extends Activity{
 	 * */
 	private void queryCounties(){
 		countyList = coolWeatherDB.loadCounties(selectedCity.getId());
+		
 		if(countyList.size() > 0){
 			dataList.clear();
 			for(County county :countyList){
@@ -277,7 +291,7 @@ public class ChooseAreaActivity extends Activity{
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
-		super.onBackPressed();
+//		super.onBackPressed();
 		if(currentLevel == LEVEL_COUNTY){
 			queryCities();
 		} else if(currentLevel == LEVEL_CITY){
